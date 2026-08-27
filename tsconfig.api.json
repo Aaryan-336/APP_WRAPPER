@@ -6,12 +6,9 @@
     "types": ["node"],
     "skipLibCheck": true,
 
-    /* Vercel bundles these functions with esbuild at deploy time, so use
-       bundler resolution rather than native Node ESM (no .js extensions
-       needed on relative imports). */
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    /* Node.js ESM in Vercel Serverless Functions */
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
