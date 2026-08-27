@@ -14,8 +14,8 @@ const STORAGE_KEY = "ask-one:config:v4";
 
 interface ConfigContextValue {
   config: AskOneConfig;
-  replaceConfig: (next: AskOneConfig) => void;
-  resetToDefaults: () => void;
+  replaceConfig: (next: AskOneConfig) => Promise<void>;
+  resetToDefaults: () => Promise<void>;
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null);
@@ -36,16 +36,68 @@ function loadInitial(): AskOneConfig {
 export function ConfigProvider({ children }: { children: ReactNode }) {
   const [config, setConfig] = useState<AskOneConfig>(loadInitial);
 
+  // Sync with cloud config on startup so changes made on other devices are pulled
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-    } catch {
-      // storage unavailable — degrade silently, in-memory state still works
-    }
-  }, [config]);
+    fetch("/api/config")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (
+          data?.config &&
+          Array.isArray(data.config.firms) &&
+          Array.isArray(data.config.applications)
+        ) {
+          setConfig(data.config);
+          try {
+            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(data.config));
+          } catch {
+            // storage unavailable
+          }
+        }
+      })
+      .catch(() => {
+        // network/API offline — keep localStorage/bundled config
+      });
+  }, []);
 
-  const replaceConfig = useCallback((next: AskOneConfig) => setConfig(next), []);
-  const resetToDefaults = useCallback(() => setConfig(ASK_ONE_CONFIG), []);
+  const replaceConfig = useCallback(async (next: AskOneConfig) => {
+    setConfig(next);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      // storage unavailable
+    }
+
+    const res = await fetch("/api/config", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify(next),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.error || "Failed to save changes to cloud storage.");
+    }
+  }, []);
+
+  const resetToDefaults = useCallback(async () => {
+    setConfig(ASK_ONE_CONFIG);
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // storage unavailable
+    }
+
+    const res = await fetch("/api/config", {
+      method: "DELETE",
+      credentials: "same-origin",
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => null);
+      throw new Error(errData?.error || "Failed to reset cloud configuration.");
+    }
+  }, []);
 
   const value = useMemo<ConfigContextValue>(
     () => ({ config, replaceConfig, resetToDefaults }),

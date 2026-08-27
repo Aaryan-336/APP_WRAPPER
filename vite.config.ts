@@ -104,6 +104,40 @@ function devAdminApiPlugin(): Plugin {
           return;
         }
 
+        if (req.url === "/api/config") {
+          if (req.method === "GET") {
+            return sendJson(200, { config: (globalThis as unknown as { __devConfig?: unknown }).__devConfig ?? null });
+          }
+
+          const cookies = parseCookie(req.headers.cookie || "");
+          const token = cookies[cookieName];
+          if (!verifyToken(token)) {
+            return sendJson(401, { error: "Not authenticated" });
+          }
+
+          if (req.method === "PUT" || req.method === "POST") {
+            let bodyStr = "";
+            req.on("data", (chunk) => {
+              bodyStr += chunk;
+            });
+            req.on("end", () => {
+              try {
+                const body = JSON.parse(bodyStr || "{}");
+                (globalThis as unknown as { __devConfig?: unknown }).__devConfig = body;
+                return sendJson(200, { ok: true });
+              } catch {
+                return sendJson(400, { error: "Invalid request body" });
+              }
+            });
+            return;
+          }
+
+          if (req.method === "DELETE") {
+            (globalThis as unknown as { __devConfig?: unknown }).__devConfig = null;
+            return sendJson(200, { ok: true });
+          }
+        }
+
         next();
       });
     },
