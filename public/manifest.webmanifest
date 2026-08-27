@@ -1,0 +1,16 @@
+{
+  "name": "ASK ONE",
+  "short_name": "ASK ONE",
+  "description": "One stop solution for all your tools — the single entry point to every ASK ONE firm application.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#030c13",
+  "theme_color": "#030c13",
+  "icons": [
+    { "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

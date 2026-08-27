@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#030c13" />
+    <title>ASK ONE — Offline</title>
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: flex; align-items: center; justify-content: center;
+        background: #030c13;
+        color: #e7ecef;
+        font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif;
+        text-align: center;
+      }
+      .wrap { padding: 24px; max-width: 360px; }
+      img { width: 64px; height: 64px; border-radius: 22%; margin-bottom: 20px; box-shadow: 0 6px 24px -6px rgba(212,175,106,0.35); }
+      h1 { font-size: 19px; font-weight: 600; margin: 0 0 8px; }
+      p { font-size: 14px; color: #9fadb6; line-height: 1.5; margin: 0 0 20px; }
+      button {
+        background: linear-gradient(180deg, #f6f8f9, #c9d2d8);
+        color: #030c13; border: none; border-radius: 10px;
+        padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <img src="/brand/icon-192.png" alt="ASK ONE" />
+      <h1>You're offline</h1>
+      <p>ASK ONE couldn't reach the network. Reconnect and try again.</p>
+      <button onclick="location.reload()">Retry</button>
+    </div>
+  </body>
+</html>
