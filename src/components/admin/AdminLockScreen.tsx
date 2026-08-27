@@ -8,16 +8,16 @@ import { useAdminAuth } from "@/state/AdminAuthContext";
 export function AdminLockScreen() {
   const { unlock } = useAdminAuth();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    const ok = await unlock(password);
+    const err = await unlock(password);
     setSubmitting(false);
-    if (!ok) {
-      setError(true);
+    if (err) {
+      setError(err);
       setPassword("");
     }
   };
@@ -38,7 +38,7 @@ export function AdminLockScreen() {
           value={password}
           onChange={(e) => {
             setPassword(e.target.value);
-            setError(false);
+            setError(null);
           }}
           placeholder="Password"
           className="admin-input text-center"
@@ -49,7 +49,7 @@ export function AdminLockScreen() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-2 flex items-center justify-center gap-1.5 text-[11px] text-state-danger"
           >
-            <TriangleAlert size={12} /> Incorrect password.
+            <TriangleAlert size={12} /> {error}
           </motion.p>
         )}
         <Button type="submit" disabled={submitting || !password} className="mt-4 w-full">

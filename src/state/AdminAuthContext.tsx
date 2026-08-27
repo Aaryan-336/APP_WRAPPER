@@ -13,7 +13,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 interface AdminAuthContextValue {
   unlocked: boolean;
   checking: boolean;
-  unlock: (password: string) => Promise<boolean>;
+  unlock: (password: string) => Promise<string | null>;
   lock: () => Promise<void>;
 }
 
@@ -31,16 +31,26 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       .finally(() => setChecking(false));
   }, []);
 
-  const unlock = useCallback(async (password: string) => {
-    const res = await fetch("/api/admin/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ password }),
-    });
-    const ok = res.ok;
-    if (ok) setUnlocked(true);
-    return ok;
+  const unlock = useCallback(async (password: string): Promise<string | null> => {
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        setUnlocked(true);
+        return null;
+      }
+      const body = await res.json().catch(() => null);
+      if (res.status === 404) {
+        return "Admin API not available. Use `npm run dev:full` for local development.";
+      }
+      return body?.error || "Incorrect password";
+    } catch {
+      return "Could not reach the server.";
+    }
   }, []);
 
   const lock = useCallback(async () => {
