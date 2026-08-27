@@ -45,12 +45,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await put(BLOB_PATH, JSON.stringify(body), {
         access: "public",
         addRandomSuffix: false,
+        allowOverwrite: true,
         contentType: "application/json",
       });
       return res.status(200).json({ ok: true });
     } catch (err) {
       console.error("Failed to save config to Vercel Blob:", err);
-      return res.status(500).json({ error: "Failed to persist configuration to Vercel Blob" });
+      const msg = err instanceof Error ? err.message : "Failed to persist configuration to Vercel Blob";
+      return res.status(500).json({ error: msg });
     }
   }
 
@@ -63,7 +65,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(200).json({ ok: true });
     } catch (err) {
       console.error("Failed to delete config from Vercel Blob:", err);
-      return res.status(500).json({ error: "Failed to reset configuration" });
+      const msg = err instanceof Error ? err.message : "Failed to reset configuration";
+      return res.status(500).json({ error: msg });
     }
   }
 
