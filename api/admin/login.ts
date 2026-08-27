@@ -39,7 +39,16 @@ export default function handler(req: VercelRequest, res: VercelResponse) {
 
   if (!ok) {
     recordLoginFailure(ip);
-    return res.status(401).json({ error: "Incorrect password" });
+    // TEMP DEBUG — remove after diagnosing the login issue
+    const expectedLen = (process.env.ADMIN_PASSWORD ?? "").trim().length;
+    return res.status(401).json({
+      error: "Incorrect password",
+      debug: {
+        submittedLength: password.trim().length,
+        expectedLength: expectedLen,
+        envVarSet: !!process.env.ADMIN_PASSWORD,
+      },
+    });
   }
 
   clearLoginFailures(ip);
