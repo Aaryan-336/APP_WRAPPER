@@ -13,9 +13,6 @@ function isPlausibleConfig(value: unknown): value is { firms: unknown[]; applica
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow cross-device retrieval of current config
   if (req.method === "GET") {
-    if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      return res.status(200).json({ config: null });
-    }
     try {
       const { blobs } = await list({ prefix: BLOB_PATH, limit: 1 });
       if (blobs.length > 0) {
@@ -36,12 +33,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const authed = isValidSessionToken(readSessionToken(req));
   if (!authed) {
     return res.status(401).json({ error: "Not authenticated" });
-  }
-
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return res.status(500).json({
-      error: "Missing BLOB_READ_WRITE_TOKEN. Please create a Blob Store in your Vercel Project -> Storage tab.",
-    });
   }
 
   if (req.method === "PUT" || req.method === "POST") {
