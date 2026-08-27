@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { isValidSessionToken, readSessionToken } from "../_lib/auth";
+import { isValidSessionToken, readSessionToken } from "../_lib/auth.ts";
 
 export default function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "GET") {

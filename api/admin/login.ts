@@ -6,7 +6,7 @@ import {
   isLockedOut,
   recordLoginFailure,
   clearLoginFailures,
-} from "../_lib/auth";
+} from "../_lib/auth.ts";
 
 function clientIp(req: VercelRequest): string {
   const fwd = req.headers["x-forwarded-for"];
