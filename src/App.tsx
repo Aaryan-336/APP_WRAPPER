@@ -10,6 +10,7 @@ import { AdminOverview } from "@/pages/admin/AdminOverview";
 import { AdminFirms } from "@/pages/admin/AdminFirms";
 import { AdminApplications } from "@/pages/admin/AdminApplications";
 import { OfflinePage } from "@/pages/OfflinePage";
+import { PwaInstallPrompt } from "@/components/pwa/PwaInstallPrompt";
 
 export default function App() {
   const [introDone, setIntroDone] = useState(false);
@@ -34,6 +35,7 @@ export default function App() {
           </Route>
         </Routes>
       </div>
+      <PwaInstallPrompt />
     </>
   );
 }
