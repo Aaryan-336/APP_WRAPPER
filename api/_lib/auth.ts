@@ -42,7 +42,7 @@ export function checkPassword(password: string): boolean {
   if (!expected) {
     throw new Error("Missing ADMIN_PASSWORD environment variable.");
   }
-  return timingSafeStringEqual(password, expected);
+  return timingSafeStringEqual(password.trim(), expected.trim());
 }
 
 export function createSessionToken(): string {
