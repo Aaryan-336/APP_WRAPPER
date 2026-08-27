@@ -54,7 +54,10 @@ export function LaunchPage() {
           : "flex h-[calc(100dvh-64px)] flex-col md:h-[calc(100dvh-72px)]"
       }
     >
-      <div className="flex items-center justify-between gap-3 border-b border-overlay/[0.06] bg-navy-900/70 px-3 py-2.5 backdrop-blur-xl md:px-5">
+      <div
+        className="flex items-center justify-between gap-3 border-b border-overlay/[0.06] bg-navy-900/70 px-3 py-2.5 backdrop-blur-xl md:px-5"
+        style={{ paddingTop: "calc(env(safe-area-inset-top) + 10px)" }}
+      >
         <div className="flex min-w-0 items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate(-1)} aria-label="Back">
             <ArrowLeft size={18} />

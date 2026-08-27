@@ -10,7 +10,10 @@ interface TopBarProps {
 
 export function TopBar({ onOpenSearch }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-40 border-b border-overlay/[0.06] bg-navy-950/70 backdrop-blur-xl transition-colors duration-300">
+    <header
+      className="sticky top-0 z-40 border-b border-overlay/[0.06] bg-navy-950/70 backdrop-blur-xl transition-colors duration-300"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
+    >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:h-[72px] md:px-8">
         <Link to="/" className="focus-ring rounded-lg transition-transform duration-200 hover:scale-[1.02]" aria-label="ASK ONE home">
           <AskOneLogo size="sm" />
