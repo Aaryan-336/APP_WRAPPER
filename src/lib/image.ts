@@ -1,6 +1,6 @@
 // Client-side logo processing. Uploaded files are downscaled to a small,
 // consistent size and re-encoded before being stored — keeps the shared
-// config blob (stored server-side in Redis) light regardless of what the
+// config blob (persisted in localStorage) light regardless of what the
 // admin uploads.
 
 const MAX_UPLOAD_BYTES = 8 * 1024 * 1024; // 8MB raw file cap, before resize

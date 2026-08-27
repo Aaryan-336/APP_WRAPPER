@@ -5,11 +5,16 @@ import { useConfig } from "@/state/ConfigStore";
 // ---------------------------------------------------------------------------
 // Admin edits are staged here, not written to the live ConfigStore directly.
 // The admin pages read/write this draft; a floating save bar (rendered by
-// AdminLayout) commits the whole draft to the shared server config (see
-// /api/config.ts) in one request, or discards it back to whatever is
-// currently live. This matches "persist automatically, or with an explicit
-// save action" from the original admin spec, choosing the explicit-save
-// path — and means a save publishes to every visitor, not just this browser.
+// AdminLayout) commits the whole draft to localStorage in one shot, or
+// discards it back to whatever is currently live. This matches "persist
+// automatically, or with an explicit save action" from the original admin
+// spec, choosing the explicit-save path.
+//
+// There's no server here — a save only affects this browser. To publish a
+// configuration for every visitor, use the Export action to download a
+// ready-to-use src/data/config.ts and redeploy. save()/resetToDefaults()
+// stay Promise-returning (even though nothing here can actually fail) so
+// the save bar's loading/error UI keeps working unchanged.
 // ---------------------------------------------------------------------------
 
 interface AdminDraftContextValue {
@@ -21,10 +26,10 @@ interface AdminDraftContextValue {
   deleteApplication: (id: string) => void;
   reorderFirms: (orderedIds: string[]) => void;
   reorderApplications: (firmId: string, orderedIds: string[]) => void;
-  /** Publishes the draft to every visitor. Throws on failure. */
+  /** Commits the draft to this browser's localStorage. */
   save: () => Promise<void>;
   discard: () => void;
-  /** Reverts every visitor to the bundled blank-slate default. Throws on failure. */
+  /** Reverts this browser to the bundled blank-slate default. */
   resetToDefaults: () => Promise<void>;
 }
 

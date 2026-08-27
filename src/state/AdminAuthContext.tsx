@@ -1,11 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 
 // ---------------------------------------------------------------------------
-// Admin auth now checks against a server-side password hash and session
-// (see /api/admin/*.ts) instead of a value sitting in localStorage — a
-// browser dev-tools user can no longer just flip a flag to get in. The
-// session is an HttpOnly cookie the browser sends automatically; this
-// context just tracks whether we currently have a valid one.
+// Admin auth checks a password held in a server env var (ADMIN_PASSWORD)
+// and issues a stateless signed session cookie — no database involved (see
+// /api/admin/*.ts and /api/_lib/auth.ts). A browser dev-tools user can't
+// flip a flag to get in; the cookie is HttpOnly and its signature is
+// verified server-side on every request. There's no in-app "change
+// password" — the password only changes by editing the env var and
+// redeploying, since there's nowhere else for it to live.
 // ---------------------------------------------------------------------------
 
 interface AdminAuthContextValue {
@@ -13,7 +15,6 @@ interface AdminAuthContextValue {
   checking: boolean;
   unlock: (password: string) => Promise<boolean>;
   lock: () => Promise<void>;
-  changePassword: (current: string, next: string) => Promise<boolean>;
 }
 
 const AdminAuthContext = createContext<AdminAuthContextValue | null>(null);
@@ -47,20 +48,8 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     setUnlocked(false);
   }, []);
 
-  const changePassword = useCallback(async (current: string, next: string) => {
-    const res = await fetch("/api/admin/change-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify({ current, next }),
-    });
-    return res.ok;
-  }, []);
-
   return (
-    <AdminAuthContext.Provider value={{ unlocked, checking, unlock, lock, changePassword }}>
-      {children}
-    </AdminAuthContext.Provider>
+    <AdminAuthContext.Provider value={{ unlocked, checking, unlock, lock }}>{children}</AdminAuthContext.Provider>
   );
 }
 

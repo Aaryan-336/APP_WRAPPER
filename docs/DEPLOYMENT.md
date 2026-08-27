@@ -1,51 +1,44 @@
 # Deployment
 
-ASK ONE is a Vite/React SPA with a small serverless backend (`/api`) that
-stores the shared configuration (firms, applications, admin password) in
-Upstash Redis. Every visitor reads the same config; Admin writes publish it
-for everyone.
+ASK ONE is a Vite/React SPA with a small serverless backend (`/api`).
 
-## 1. Create a Redis database (via Vercel, no separate account)
+- **Auth has no database.** The admin password lives in the `ADMIN_PASSWORD`
+  env var and is checked directly on each login; sessions are a stateless
+  signed cookie (HMAC, verified with no lookup). Nothing auth-related is
+  stored anywhere.
+- **Shared config (firms/applications) uses localStorage**, seeded from the
+  bundled default in `src/data/config.ts`. Admin edits persist in the
+  current browser. To publish a configuration for every visitor, use the
+  Admin Export action to download a ready-to-use `src/data/config.ts`,
+  commit it, and redeploy.
 
-1. In your Vercel project → **Storage** tab → **Create Database** → **Upstash
-   Redis** (marketplace integration). This provisions an Upstash Redis
-   database under your Vercel account — no separate Upstash signup — and
-   automatically injects its REST credentials
-   (`UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`) into your
-   project's environment variables.
-2. That's it for this step — nothing to copy-paste manually.
-
-   (Creating the database directly at [upstash.com](https://upstash.com)
-   instead works identically — same underlying service, same env var names
-   — if you'd rather manage it outside Vercel. `api/_lib/redis.ts` also
-   accepts the older `KV_REST_API_URL`/`KV_REST_API_TOKEN` names as a
-   fallback, in case Vercel's integration naming changes again.)
-
-## 2. Set the remaining environment variable
+## 1. Set the auth environment variables
 
 In Vercel: Project Settings → Environment Variables, add for
 Production/Preview/Development as needed:
 
-| Variable                | Value                                          |
-| ------------------------ | ----------------------------------------------- |
-| `ADMIN_PASSWORD_DEFAULT` | any password — only used the very first time `/api/admin/login` runs against an empty database. Change it from Admin → Overview after logging in once. |
+| Variable         | Value                                                                 |
+| ----------------- | ---------------------------------------------------------------------- |
+| `ADMIN_PASSWORD`  | whatever you want the admin password to be.                           |
+| `SESSION_SECRET`  | any long random string — e.g. `openssl rand -hex 32`. Signs session cookies; changing it invalidates all logged-in sessions. |
 
-The two `UPSTASH_REDIS_REST_*` variables are already set from step 1. See
-`.env.example` for the full list, for local dev.
+To rotate the password later: change `ADMIN_PASSWORD` and redeploy. There's
+no in-app "change password" form — there's nowhere for it to persist to
+without a database, which is the whole point of keeping auth
+database-free.
 
-## 3. Deploy
+## 2. Deploy
 
 1. Push this repo to GitHub.
 2. Import it into Vercel — it auto-detects the Vite build (`npm run build`,
    output `dist`) and the `/api/*.ts` files as serverless functions.
 3. `vercel.json` already routes all non-`/api` paths to `index.html` so
    client-side routing (React Router) works on refresh/direct links.
-4. Deploy. First visitor to hit `/admin` and log in seeds the password hash
-   in Redis from `ADMIN_PASSWORD_DEFAULT`.
+4. Deploy, then log into `/admin` with `ADMIN_PASSWORD`.
 
 Custom domain: add it in Vercel → Domains, point your DNS at it. HTTPS is
-automatic — the service worker and admin session cookie both require it in
-production (`Secure` cookie flag is only set when `VERCEL_ENV=production`).
+automatic — the admin session cookie's `Secure` flag is only set when
+`VERCEL_ENV=production`, so it still works over local `http://localhost`.
 
 ## Local development
 
@@ -61,21 +54,24 @@ Two modes, pick based on what you're doing:
   *and* actually executes the `/api/*` functions locally, matching
   production. Requires the Vercel CLI to be logged in
   (`npx vercel login`) and either `vercel link` + `vercel env pull`, or a
-  local `.env.local` (copy `.env.example`) with real Upstash credentials.
+  local `.env.local` (copy `.env.example`) with `ADMIN_PASSWORD` and
+  `SESSION_SECRET`.
 
-Use `dev:full` for anything touching Admin, login, or saved configuration.
+Use `dev:full` for anything touching Admin or login.
 
 ## Known limitations, on purpose for now
 
-- **Logos are stored inline.** Uploaded firm/app logos are resized to a
-  small WEBP and stored as a base64 data URI directly inside the shared
-  config JSON blob in Redis. Fine for a handful of small logos; if you end
-  up with many large images, consider moving to Vercel Blob (or similar
-  object storage) and storing URLs instead of inline data.
-- **Login rate limiting is basic.** `/api/admin/login` blocks an IP after 8
-  failed attempts for 15 minutes, tracked in Redis. Adequate for an
-  internal tool, not hardened against a distributed attack.
+- **Login rate limiting is in-memory, not bulletproof.** `/api/admin/login`
+  blocks an IP after 8 failed attempts for 15 minutes, tracked in a
+  module-scoped `Map`. That resets on a cold start and doesn't coordinate
+  across concurrent function instances — a real deterrent against casual
+  scripted brute-forcing, not a hard guarantee.
 - **One shared admin password**, not per-person accounts. Anyone with the
   password has full write access to the shared config. If you need
   per-person accounts/audit trail later, that's a bigger addition (real
   user auth) beyond this password gate.
+- **Logos are stored inline.** Uploaded firm/app logos are resized to a
+  small WEBP and stored as a base64 data URI directly inside the config
+  JSON blob in localStorage. Fine for a handful of small logos; if you end
+  up with many large images, consider moving to Vercel Blob (or similar
+  object storage) and storing URLs instead of inline data.

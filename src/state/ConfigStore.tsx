@@ -3,91 +3,53 @@ import type { Application, AskOneConfig, Firm } from "@/types";
 import { ASK_ONE_CONFIG } from "@/data/config";
 
 // ---------------------------------------------------------------------------
-// The shared configuration now lives server-side (Vercel serverless
-// functions + Upstash Redis, see /api/config.ts) so every visitor sees the
-// same firms/applications, not just whoever last edited them in their own
-// browser. This store fetches it on mount and exposes a `replaceConfig`
-// used by the admin draft/save flow to publish a full new snapshot.
-//
-// Until the first fetch resolves, the bundled blank-slate default is shown
-// — the intro screen's ~2.6s cover means this almost never becomes visible
-// in practice.
+// No backend, no database — the config lives in this browser's localStorage,
+// seeded from the bundled default in src/data/config.ts. That means Admin
+// edits are only visible in the browser that made them; to publish a setup
+// for every visitor, use Admin's Export action to download a ready-to-use
+// src/data/config.ts, commit it, and redeploy. See docs/DEPLOYMENT.md.
 // ---------------------------------------------------------------------------
+
+const STORAGE_KEY = "ask-one:config:v4";
 
 interface ConfigContextValue {
   config: AskOneConfig;
-  loading: boolean;
-  error: string | null;
-  refetch: () => Promise<void>;
-  /** Publishes a full new config to every visitor. Throws on failure
-   * (network error or an expired admin session) — callers should catch. */
-  replaceConfig: (next: AskOneConfig) => Promise<void>;
-  /** Clears the shared override, reverting every visitor to the bundled
-   * blank-slate default. Throws on failure. */
-  resetToDefaults: () => Promise<void>;
+  replaceConfig: (next: AskOneConfig) => void;
+  resetToDefaults: () => void;
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null);
 
-async function fetchSharedConfig(): Promise<AskOneConfig> {
-  const res = await fetch("/api/config");
-  if (!res.ok) throw new Error(`Failed to load configuration (${res.status})`);
-  const body = (await res.json()) as { config: AskOneConfig | null };
-  return body.config ?? ASK_ONE_CONFIG;
+function loadInitial(): AskOneConfig {
+  if (typeof window === "undefined") return ASK_ONE_CONFIG;
+  try {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+    if (!raw) return ASK_ONE_CONFIG;
+    const parsed = JSON.parse(raw) as AskOneConfig;
+    if (!parsed.firms || !parsed.applications) return ASK_ONE_CONFIG;
+    return parsed;
+  } catch {
+    return ASK_ONE_CONFIG;
+  }
 }
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<AskOneConfig>(ASK_ONE_CONFIG);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const refetch = useCallback(async () => {
-    setLoading(true);
-    try {
-      const next = await fetchSharedConfig();
-      setConfig(next);
-      setError(null);
-    } catch (err) {
-      // Keep whatever config is currently shown (bundled default on first
-      // load) rather than blanking the app on a transient network error.
-      setError(err instanceof Error ? err.message : "Failed to load configuration");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [config, setConfig] = useState<AskOneConfig>(loadInitial);
 
   useEffect(() => {
-    refetch();
-  }, [refetch]);
-
-  const replaceConfig = useCallback(async (next: AskOneConfig) => {
-    const res = await fetch("/api/config", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
-      body: JSON.stringify(next),
-    });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `Save failed (${res.status})`);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+    } catch {
+      // storage unavailable — degrade silently, in-memory state still works
     }
-    setConfig(next);
-    setError(null);
-  }, []);
+  }, [config]);
 
-  const resetToDefaults = useCallback(async () => {
-    const res = await fetch("/api/config", { method: "DELETE", credentials: "same-origin" });
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.error || `Reset failed (${res.status})`);
-    }
-    setConfig(ASK_ONE_CONFIG);
-    setError(null);
-  }, []);
+  const replaceConfig = useCallback((next: AskOneConfig) => setConfig(next), []);
+  const resetToDefaults = useCallback(() => setConfig(ASK_ONE_CONFIG), []);
 
   const value = useMemo<ConfigContextValue>(
-    () => ({ config, loading, error, refetch, replaceConfig, resetToDefaults }),
-    [config, loading, error, refetch, replaceConfig, resetToDefaults],
+    () => ({ config, replaceConfig, resetToDefaults }),
+    [config, replaceConfig, resetToDefaults],
   );
 
   return <ConfigContext.Provider value={value}>{children}</ConfigContext.Provider>;
