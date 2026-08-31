@@ -160,20 +160,12 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
             <div className="flex flex-col items-center overflow-hidden">
               <h1 className="font-display text-5xl font-semibold tracking-tight sm:text-6xl">
                 <motion.span
-                  className="inline-block text-silver-100"
+                  className="text-gradient-gold relative inline-block"
                   initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ duration: reduceMotion ? 0.25 : 0.6, delay: reduceMotion ? 0.05 : 0.55, ease: [0.16, 1, 0.3, 1] }}
                 >
                   ONE
-                </motion.span>{" "}
-                <motion.span
-                  className="text-gradient-gold relative inline-block"
-                  initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: reduceMotion ? 0.25 : 0.6, delay: reduceMotion ? 0.1 : 0.72, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  ASK
                   {!reduceMotion && (
                     <motion.span
                       aria-hidden
@@ -188,6 +180,14 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                       transition={{ duration: 1.1, delay: 1.15, ease: "easeInOut" }}
                     />
                   )}
+                </motion.span>{" "}
+                <motion.span
+                  className="inline-block text-silver-100"
+                  initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
+                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                  transition={{ duration: reduceMotion ? 0.25 : 0.6, delay: reduceMotion ? 0.1 : 0.72, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  ASK
                 </motion.span>
               </h1>
 

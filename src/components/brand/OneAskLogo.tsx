@@ -40,8 +40,8 @@ export function OneAskLogo({ variant = "full", size = "md", showTagline = false,
       {showWord && (
         <div className="flex flex-col leading-none">
           <span className={cn("font-display font-semibold tracking-tight", wordmarkSize[size])}>
-            <span className="text-silver-100">ONE</span>{" "}
-            <span className="text-gradient-gold">ASK</span>
+            <span className="text-gradient-gold">ONE</span>{" "}
+            <span className="text-silver-100">ASK</span>
           </span>
           {showTagline && (
             <span className="mt-2 text-[0.68em] font-medium uppercase tracking-[0.32em] text-silver-400">
