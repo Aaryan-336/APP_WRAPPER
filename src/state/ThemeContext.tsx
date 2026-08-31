@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 
 export type Theme = "dark" | "light";
 
-const STORAGE_KEY = "ask-one:theme";
+const STORAGE_KEY = "one-ask:theme";
 
 interface ThemeContextValue {
   theme: Theme;

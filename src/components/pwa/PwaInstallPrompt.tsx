@@ -48,7 +48,7 @@ export function PwaInstallPrompt() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-sm font-medium text-silver-100">
-                    ASK ONE installed!
+                    ONE ASK installed!
                   </p>
                   <p className="text-xs text-silver-400">
                     Find it on your home screen.
@@ -63,7 +63,7 @@ export function PwaInstallPrompt() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-silver-100">
-                    Install ASK ONE
+                    Install ONE ASK
                   </p>
                   <p className="mt-0.5 text-xs leading-relaxed text-silver-400">
                     Add to your home screen for instant access &amp; offline

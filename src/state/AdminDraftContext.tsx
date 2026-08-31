@@ -1,24 +1,19 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import type { Application, AskOneConfig, CardTemplate, Firm } from "@/types";
+import type { Application, OneAskConfig, CardTemplate, Firm } from "@/types";
 import { useConfig } from "@/state/ConfigStore";
 
 // ---------------------------------------------------------------------------
 // Admin edits are staged here, not written to the live ConfigStore directly.
 // The admin pages read/write this draft; a floating save bar (rendered by
-// AdminLayout) commits the whole draft to localStorage in one shot, or
-// discards it back to whatever is currently live. This matches "persist
-// automatically, or with an explicit save action" from the original admin
-// spec, choosing the explicit-save path.
-//
-// There's no server here — a save only affects this browser. To publish a
-// configuration for every visitor, use the Export action to download a
-// ready-to-use src/data/config.ts and redeploy. save()/resetToDefaults()
-// stay Promise-returning (even though nothing here can actually fail) so
-// the save bar's loading/error UI keeps working unchanged.
+// AdminLayout) commits the whole draft in one shot via ConfigStore, which
+// persists it to localStorage and syncs it to Vercel Blob so every device
+// picks up the change — or discards the draft back to whatever is live.
+// This matches "persist automatically, or with an explicit save action"
+// from the original admin spec, choosing the explicit-save path.
 // ---------------------------------------------------------------------------
 
 interface AdminDraftContextValue {
-  draft: AskOneConfig;
+  draft: OneAskConfig;
   dirty: boolean;
   updateFirm: (id: string, patch: Partial<Firm>) => void;
   updateApplication: (id: string, patch: Partial<Application>) => void;
@@ -60,7 +55,7 @@ function makeBlankApplication(firmId: string, displayOrder: number): Application
 
 export function AdminDraftProvider({ children }: { children: ReactNode }) {
   const { config: liveConfig, replaceConfig, resetToDefaults: resetLiveToDefaults } = useConfig();
-  const [draft, setDraft] = useState<AskOneConfig>(liveConfig);
+  const [draft, setDraft] = useState<OneAskConfig>(liveConfig);
   const lastSyncedLive = useRef(liveConfig);
 
   // Re-sync the draft whenever the live config changes for a reason other

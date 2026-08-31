@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Command, Search, Settings } from "lucide-react";
-import { AskOneLogo } from "@/components/brand/AskOneLogo";
+import { OneAskLogo } from "@/components/brand/OneAskLogo";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 
@@ -15,8 +15,8 @@ export function TopBar({ onOpenSearch }: TopBarProps) {
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 md:h-[72px] md:px-8">
-        <Link to="/" className="focus-ring rounded-lg transition-transform duration-200 hover:scale-[1.02]" aria-label="ASK ONE home">
-          <AskOneLogo size="sm" />
+        <Link to="/" className="focus-ring rounded-lg transition-transform duration-200 hover:scale-[1.02]" aria-label="ONE ASK home">
+          <OneAskLogo size="sm" />
         </Link>
 
         <div className="flex items-center gap-1.5 md:gap-2.5">

@@ -72,7 +72,7 @@ export function FirmCard({ firm, onSelect, index }: FirmCardProps) {
           <GlassmorphismCta
             label={`Enter ${firm.shortName}`}
             avatarSrc="/brand/icon-192.png"
-            avatarAlt="ASK ONE"
+            avatarAlt="ONE ASK"
             onClick={(e) => {
               e.preventDefault();
               onSelect();

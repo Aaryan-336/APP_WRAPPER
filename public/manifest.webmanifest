@@ -1,7 +1,7 @@
 {
-  "name": "ASK ONE",
-  "short_name": "ASK ONE",
-  "description": "One stop solution for all your tools — the single entry point to every ASK ONE firm application.",
+  "name": "ONE ASK",
+  "short_name": "ONE ASK",
+  "description": "One stop solution for all your tools — the single entry point to every ONE ASK firm application.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

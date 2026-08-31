@@ -1,4 +1,4 @@
-import type { Application, AskOneConfig } from "@/types";
+import type { Application, OneAskConfig } from "@/types";
 
 export interface SearchResult {
   app: Application;
@@ -10,7 +10,7 @@ function norm(s: string) {
   return s.toLowerCase().trim();
 }
 
-export function searchApplications(config: AskOneConfig, rawQuery: string): SearchResult[] {
+export function searchApplications(config: OneAskConfig, rawQuery: string): SearchResult[] {
   const query = norm(rawQuery);
   const firmsById = Object.fromEntries(config.firms.map((f) => [f.id, f]));
 

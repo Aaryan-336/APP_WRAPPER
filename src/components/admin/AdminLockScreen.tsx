@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Lock, LoaderCircle, TriangleAlert } from "lucide-react";
-import { AskOneLogo } from "@/components/brand/AskOneLogo";
+import { OneAskLogo } from "@/components/brand/OneAskLogo";
 import { Button } from "@/components/ui/button";
 import { useAdminAuth } from "@/state/AdminAuthContext";
 
@@ -24,7 +24,7 @@ export function AdminLockScreen() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-sm flex-col items-center justify-center px-4 text-center">
-      <AskOneLogo variant="icon" size="lg" className="mb-6" />
+      <OneAskLogo variant="icon" size="lg" className="mb-6" />
       <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl border border-overlay/10 bg-overlay/[0.03] text-silver-400">
         <Lock size={18} />
       </div>

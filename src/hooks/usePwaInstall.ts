@@ -28,7 +28,7 @@ interface UsePwaInstallReturn {
   dismiss: () => void;
 }
 
-const DISMISS_KEY = "ask-one:pwa-install-dismissed";
+const DISMISS_KEY = "one-ask:pwa-install-dismissed";
 const DISMISS_COOLDOWN_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
 
 export function usePwaInstall(): UsePwaInstallReturn {

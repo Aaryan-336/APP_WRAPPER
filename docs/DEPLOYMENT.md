@@ -1,6 +1,6 @@
 # Deployment
 
-ASK ONE is a Vite/React SPA with a small serverless backend (`/api`).
+ONE ASK is a Vite/React SPA with a small serverless backend (`/api`).
 
 - **Auth has no database.** The admin password lives in the `ADMIN_PASSWORD`
   env var and is checked directly on each login; sessions are a stateless

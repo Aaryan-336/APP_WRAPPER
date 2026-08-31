@@ -1,40 +1,39 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Application, AskOneConfig, Firm } from "@/types";
-import { ASK_ONE_CONFIG } from "@/data/config";
+import type { Application, OneAskConfig, Firm } from "@/types";
+import { ONE_ASK_CONFIG } from "@/data/config";
 
 // ---------------------------------------------------------------------------
-// No backend, no database — the config lives in this browser's localStorage,
-// seeded from the bundled default in src/data/config.ts. That means Admin
-// edits are only visible in the browser that made them; to publish a setup
-// for every visitor, use Admin's Export action to download a ready-to-use
-// src/data/config.ts, commit it, and redeploy. See docs/DEPLOYMENT.md.
+// Config is cached in this browser's localStorage (seeded from the bundled
+// default in src/data/config.ts) and synced with the shared copy held in
+// Vercel Blob via /api/config, so Admin edits saved on one device show up
+// on every other device/browser. See docs/DEPLOYMENT.md.
 // ---------------------------------------------------------------------------
 
-const STORAGE_KEY = "ask-one:config:v4";
+const STORAGE_KEY = "one-ask:config:v4";
 
 interface ConfigContextValue {
-  config: AskOneConfig;
-  replaceConfig: (next: AskOneConfig) => Promise<void>;
+  config: OneAskConfig;
+  replaceConfig: (next: OneAskConfig) => Promise<void>;
   resetToDefaults: () => Promise<void>;
 }
 
 const ConfigContext = createContext<ConfigContextValue | null>(null);
 
-function loadInitial(): AskOneConfig {
-  if (typeof window === "undefined") return ASK_ONE_CONFIG;
+function loadInitial(): OneAskConfig {
+  if (typeof window === "undefined") return ONE_ASK_CONFIG;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return ASK_ONE_CONFIG;
-    const parsed = JSON.parse(raw) as AskOneConfig;
-    if (!parsed.firms || !parsed.applications) return ASK_ONE_CONFIG;
+    if (!raw) return ONE_ASK_CONFIG;
+    const parsed = JSON.parse(raw) as OneAskConfig;
+    if (!parsed.firms || !parsed.applications) return ONE_ASK_CONFIG;
     return parsed;
   } catch {
-    return ASK_ONE_CONFIG;
+    return ONE_ASK_CONFIG;
   }
 }
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<AskOneConfig>(loadInitial);
+  const [config, setConfig] = useState<OneAskConfig>(loadInitial);
 
   // Sync with cloud config on startup so changes made on other devices are pulled
   useEffect(() => {
@@ -59,7 +58,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
       });
   }, []);
 
-  const replaceConfig = useCallback(async (next: AskOneConfig) => {
+  const replaceConfig = useCallback(async (next: OneAskConfig) => {
     setConfig(next);
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -81,7 +80,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const resetToDefaults = useCallback(async () => {
-    setConfig(ASK_ONE_CONFIG);
+    setConfig(ONE_ASK_CONFIG);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
     } catch {

@@ -85,7 +85,7 @@ export function ApplicationMasonryCard({ app, index }: ApplicationMasonryCardPro
 
         <div className="mt-5 flex items-center gap-1.5 text-xs font-medium text-silver-500 transition-colors group-hover:text-silver-300">
           <LaunchIcon size={12} />
-          {app.launchMode === "embedded" ? "Opens inside ASK ONE" : app.launchMode === "same-window" ? "Opens in this window" : "Opens in new tab"}
+          {app.launchMode === "embedded" ? "Opens inside ONE ASK" : app.launchMode === "same-window" ? "Opens in this window" : "Opens in new tab"}
           <ArrowUpRight size={13} className="ml-auto transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </div>
       </div>

@@ -2,7 +2,7 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { put, list, del } from "@vercel/blob";
 import { isValidSessionToken, readSessionToken } from "./_lib/auth.js";
 
-const BLOB_PATH = "ask-one/config.json";
+const BLOB_PATH = "one-ask/config.json";
 
 function isPlausibleConfig(value: unknown): value is { firms: unknown[]; applications: unknown[] } {
   if (!value || typeof value !== "object") return false;

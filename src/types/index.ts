@@ -1,4 +1,4 @@
-// ASK ONE — Configuration-driven data model
+// ONE ASK — Configuration-driven data model
 // Everything the UI renders (firms, applications, branding, ordering,
 // launch behavior) flows from these types. No product data is ever
 // hardcoded into rendering logic.
@@ -55,7 +55,7 @@ export interface Application {
   isActive: boolean;
 }
 
-export interface AskOneConfig {
+export interface OneAskConfig {
   firms: Firm[];
   applications: Application[];
 }

@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-interface AskOneLogoProps {
+interface OneAskLogoProps {
   variant?: "full" | "wordmark" | "icon";
   size?: "sm" | "md" | "lg" | "xl";
   showTagline?: boolean;
@@ -21,9 +21,9 @@ const iconSize = {
   xl: "h-24 w-24",
 };
 
-/** The ASK ONE brand mark: icon badge + custom wordmark, rendered in CSS/text
+/** The ONE ASK brand mark: icon badge + custom wordmark, rendered in CSS/text
  * (not a raster crop) so it stays crisp at every size used across the app. */
-export function AskOneLogo({ variant = "full", size = "md", showTagline = false, className }: AskOneLogoProps) {
+export function OneAskLogo({ variant = "full", size = "md", showTagline = false, className }: OneAskLogoProps) {
   const showIcon = variant === "full" || variant === "icon";
   const showWord = variant === "full" || variant === "wordmark";
 
@@ -32,7 +32,7 @@ export function AskOneLogo({ variant = "full", size = "md", showTagline = false,
       {showIcon && (
         <img
           src="/brand/icon-512.png"
-          alt="ASK ONE"
+          alt="ONE ASK"
           className={cn(iconSize[size], "rounded-[26%] shadow-[0_6px_24px_-6px_rgba(212,175,106,0.35)]")}
           draggable={false}
         />
@@ -40,8 +40,8 @@ export function AskOneLogo({ variant = "full", size = "md", showTagline = false,
       {showWord && (
         <div className="flex flex-col leading-none">
           <span className={cn("font-display font-semibold tracking-tight", wordmarkSize[size])}>
-            <span className="text-silver-100">ASK</span>{" "}
-            <span className="text-gradient-gold">ONE</span>
+            <span className="text-silver-100">ONE</span>{" "}
+            <span className="text-gradient-gold">ASK</span>
           </span>
           {showTagline && (
             <span className="mt-2 text-[0.68em] font-medium uppercase tracking-[0.32em] text-silver-400">

@@ -1,4 +1,4 @@
-import type { Application, AskOneConfig, Firm } from "@/types";
+import type { Application, OneAskConfig, Firm } from "@/types";
 
 // ---------------------------------------------------------------------------
 // Blank-slate configuration. This stands in for a future `GET /api/config`
@@ -58,7 +58,7 @@ export const FIRMS: Firm[] = [
 
 export const APPLICATIONS: Application[] = [];
 
-export const ASK_ONE_CONFIG: AskOneConfig = {
+export const ONE_ASK_CONFIG: OneAskConfig = {
   firms: FIRMS,
   applications: APPLICATIONS,
 };

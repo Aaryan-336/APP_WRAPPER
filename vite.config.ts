@@ -18,8 +18,8 @@ function devAdminApiPlugin(): Plugin {
         }
 
         const env = loadEnv("development", process.cwd(), "");
-        const adminPassword = (env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "askone2026").trim();
-        const sessionSecret = (env.SESSION_SECRET || process.env.SESSION_SECRET || "dev-secret-ask-one-2026-local").trim();
+        const adminPassword = (env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || "oneask2026").trim();
+        const sessionSecret = (env.SESSION_SECRET || process.env.SESSION_SECRET || "dev-secret-one-ask-2026-local").trim();
 
         const sendJson = (status: number, data: unknown, headers?: Record<string, string>) => {
           res.statusCode = status;
