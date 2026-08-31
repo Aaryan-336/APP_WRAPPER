@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { OneAskLogo } from "@/components/brand/OneAskLogo";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { useTheme } from "@/state/ThemeContext";
 
 const SESSION_KEY = "one-ask:intro-seen";
 const AUTO_DISMISS_MS = 3100;
@@ -11,10 +12,51 @@ interface IntroScreenProps {
   onDone: () => void;
 }
 
+// The boot screen mirrors two fixed brand sheets (dark + light) rather than
+// the app's general-purpose theme tokens, so every color here is a literal
+// picked to match one of those two sheets exactly, gated on the current
+// theme — none of it should reference the theme-reactive CSS variables.
+const PALETTE = {
+  dark: {
+    bg: "#030c13",
+    wordmark: "/brand/wordmark-primary.png",
+    ring: "rgba(255,255,255,0.06)",
+    gold: "#d4af6a",
+    tagline: "#9fadb6",
+    tap: "#74858f",
+    ambient:
+      "radial-gradient(80% 60% at 50% 38%, rgba(28,68,80,0.55) 0%, transparent 60%), radial-gradient(60% 50% at 78% 78%, rgba(212,175,106,0.14) 0%, transparent 65%), radial-gradient(50% 45% at 15% 80%, rgba(79,214,202,0.10) 0%, transparent 65%)",
+    pulse: "radial-gradient(45% 40% at 50% 45%, rgba(212,175,106,0.16), transparent 70%)",
+    conic:
+      "conic-gradient(from 0deg, transparent 0%, rgba(212,175,106,0.16) 12%, transparent 24%, transparent 50%, rgba(79,214,202,0.12) 62%, transparent 74%, transparent 100%)",
+    flash: "radial-gradient(38% 32% at 50% 46%, rgba(246,248,249,0.9) 0%, rgba(212,175,106,0.4) 38%, transparent 72%)",
+    flashPeak: 0.85,
+    sweep: "rgba(255,255,255,0.85)",
+  },
+  light: {
+    bg: "#f4f2ec",
+    wordmark: "/brand/wordmark-primary-light.png",
+    ring: "rgba(15,30,41,0.09)",
+    gold: "#9e7828",
+    tagline: "#5b6570",
+    tap: "#7c8790",
+    ambient:
+      "radial-gradient(80% 60% at 50% 38%, rgba(158,120,40,0.10) 0%, transparent 60%), radial-gradient(60% 50% at 78% 78%, rgba(158,120,40,0.12) 0%, transparent 65%), radial-gradient(50% 45% at 15% 80%, rgba(18,133,126,0.10) 0%, transparent 65%)",
+    pulse: "radial-gradient(45% 40% at 50% 45%, rgba(158,120,40,0.12), transparent 70%)",
+    conic:
+      "conic-gradient(from 0deg, transparent 0%, rgba(158,120,40,0.12) 12%, transparent 24%, transparent 50%, rgba(18,133,126,0.10) 62%, transparent 74%, transparent 100%)",
+    flash: "radial-gradient(38% 32% at 50% 46%, rgba(255,255,255,0.95) 0%, rgba(158,120,40,0.35) 38%, transparent 72%)",
+    flashPeak: 0.7,
+    sweep: "rgba(15,30,41,0.35)",
+  },
+} as const;
+
 export function IntroScreen({ onDone }: IntroScreenProps) {
   const reduceMotion = useReducedMotion();
+  const { theme } = useTheme();
   const [visible, setVisible] = useState(true);
   const [exiting, setExiting] = useState(false);
+  const c = PALETTE[theme];
 
   useEffect(() => {
     const already = typeof window !== "undefined" && sessionStorage.getItem(SESSION_KEY);
@@ -43,7 +85,8 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
     <AnimatePresence onExitComplete={handleExitComplete}>
       {!exiting && (
         <motion.div
-          className="fixed inset-0 z-[200] flex cursor-pointer flex-col items-center justify-center overflow-hidden bg-navy-950"
+          className="fixed inset-0 z-[200] flex cursor-pointer flex-col items-center justify-center overflow-hidden"
+          style={{ backgroundColor: c.bg }}
           role="button"
           tabIndex={0}
           aria-label="Skip intro"
@@ -60,31 +103,20 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
           {!reduceMotion && (
             <motion.div
               className="pointer-events-none absolute inset-0 z-20"
-              style={{
-                background:
-                  "radial-gradient(38% 32% at 50% 46%, rgba(246,248,249,0.9) 0%, rgba(212,175,106,0.4) 38%, transparent 72%)",
-              }}
+              style={{ background: c.flash }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0, 0.85, 0] }}
+              animate={{ opacity: [0, c.flashPeak, 0] }}
               transition={{ duration: 0.65, ease: "easeOut" }}
             />
           )}
 
           {/* Ambient background */}
           <div className="pointer-events-none absolute inset-0">
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(80% 60% at 50% 38%, rgba(28,68,80,0.55) 0%, transparent 60%), radial-gradient(60% 50% at 78% 78%, rgba(212,175,106,0.14) 0%, transparent 65%), radial-gradient(50% 45% at 15% 80%, rgba(79,214,202,0.10) 0%, transparent 65%)",
-              }}
-            />
+            <div className="absolute inset-0" style={{ background: c.ambient }} />
             {!reduceMotion && (
               <motion.div
                 className="absolute inset-0 opacity-70"
-                style={{
-                  background: "radial-gradient(45% 40% at 50% 45%, rgba(212,175,106,0.16), transparent 70%)",
-                }}
+                style={{ background: c.pulse }}
                 animate={{ scale: [1, 1.12, 1], opacity: [0.5, 0.8, 0.5] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
               />
@@ -96,8 +128,7 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                   marginLeft: -450,
                   marginTop: -450,
                   borderRadius: "50%",
-                  background:
-                    "conic-gradient(from 0deg, transparent 0%, rgba(212,175,106,0.16) 12%, transparent 24%, transparent 50%, rgba(79,214,202,0.12) 62%, transparent 74%, transparent 100%)",
+                  background: c.conic,
                 }}
                 animate={{ rotate: 360 }}
                 transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
@@ -107,14 +138,23 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
             {[420, 320, 220].map((d, i) => (
               <motion.div
                 key={d}
-                className="absolute left-1/2 top-1/2 rounded-full border border-overlay/[0.06]"
-                style={{ width: d * 2.4, height: d * 2.4, marginLeft: -(d * 1.2), marginTop: -(d * 1.2) }}
+                className="absolute left-1/2 top-1/2 rounded-full"
+                style={{
+                  width: d * 2.4,
+                  height: d * 2.4,
+                  marginLeft: -(d * 1.2),
+                  marginTop: -(d * 1.2),
+                  border: `1px solid ${c.ring}`,
+                }}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 1.1, delay: reduceMotion ? 0 : 0.15 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
               />
             ))}
-            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-navy-950 to-transparent" />
+            <div
+              className="absolute inset-x-0 bottom-0 h-40"
+              style={{ background: `linear-gradient(to top, ${c.bg}, transparent)` }}
+            />
           </div>
 
           {/* Logo + wordmark */}
@@ -130,8 +170,8 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                 [0, 1].map((i) => (
                   <motion.span
                     key={i}
-                    className="absolute rounded-[26%] border border-gold-400/40"
-                    style={{ width: 96, height: 96 }}
+                    className="absolute rounded-[26%]"
+                    style={{ width: 96, height: 96, border: `1px solid ${c.gold}66` }}
                     initial={{ opacity: 0.55, scale: 1 }}
                     animate={{ opacity: 0, scale: 2.1 }}
                     transition={{ duration: 1.3, delay: 0.15 + i * 0.22, ease: "easeOut" }}
@@ -165,7 +205,7 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                 transition={{ duration: reduceMotion ? 0.25 : 0.65, delay: reduceMotion ? 0.05 : 0.55, ease: [0.16, 1, 0.3, 1] }}
               >
                 <img
-                  src="/brand/wordmark-primary.png"
+                  src={c.wordmark}
                   alt="ONE ASK"
                   className="h-[52px] w-auto select-none sm:h-[64px] md:h-[72px]"
                   draggable={false}
@@ -175,8 +215,8 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
                     aria-hidden
                     className="pointer-events-none absolute inset-y-0 left-0 w-1/3 skew-x-[-18deg]"
                     style={{
-                      background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)",
-                      mixBlendMode: "overlay",
+                      background: `linear-gradient(90deg, transparent, ${c.sweep}, transparent)`,
+                      mixBlendMode: theme === "light" ? "multiply" : "overlay",
                     }}
                     initial={{ x: "-140%", opacity: 0 }}
                     animate={{ x: "340%", opacity: [0, 1, 0] }}
@@ -186,8 +226,8 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
               </motion.div>
 
               <motion.span
-                className="mt-3 h-px bg-gradient-to-r from-transparent via-gold-400 to-transparent"
-                style={{ width: "72%" }}
+                className="mt-3 h-px"
+                style={{ width: "72%", background: `linear-gradient(90deg, transparent, ${c.gold}, transparent)` }}
                 initial={{ scaleX: 0, opacity: 0 }}
                 animate={{ scaleX: 1, opacity: 0.8 }}
                 transition={{ duration: reduceMotion ? 0.2 : 0.7, delay: reduceMotion ? 0.15 : 1.15, ease: [0.16, 1, 0.3, 1] }}
@@ -198,9 +238,10 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: reduceMotion ? 0.2 : 1.35, ease: "easeOut" }}
-              className="mt-5 text-xs font-medium uppercase tracking-[0.38em] text-silver-400 sm:text-sm"
+              className="mt-5 text-xs font-medium uppercase tracking-[0.38em] sm:text-sm"
+              style={{ color: c.tagline }}
             >
-              One stop solution <span className="text-gold-400">for all your tools</span>
+              One stop solution <span style={{ color: c.gold }}>for all your tools</span>
             </motion.p>
           </motion.div>
 
@@ -208,7 +249,8 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.55 }}
             transition={{ duration: 0.5, delay: reduceMotion ? 0.3 : 1.7 }}
-            className="absolute bottom-9 text-[11px] tracking-[0.2em] text-silver-500"
+            className="absolute bottom-9 text-[11px] tracking-[0.2em]"
+            style={{ color: c.tap }}
           >
             TAP TO CONTINUE
           </motion.span>

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/state/ThemeContext";
 
 interface OneAskLogoProps {
   variant?: "full" | "wordmark" | "icon";
@@ -24,6 +25,7 @@ const iconSize = {
 /** The ONE ASK brand mark: icon badge + custom wordmark, rendered in CSS/text
  * (not a raster crop) so it stays crisp at every size used across the app. */
 export function OneAskLogo({ variant = "full", size = "md", showTagline = false, className }: OneAskLogoProps) {
+  const { theme } = useTheme();
   const showIcon = variant === "full" || variant === "icon";
   const showWord = variant === "full" || variant === "wordmark";
 
@@ -31,7 +33,7 @@ export function OneAskLogo({ variant = "full", size = "md", showTagline = false,
     <div className={cn("inline-flex items-center gap-3", className)}>
       {showIcon && (
         <img
-          src="/brand/icon-512.png"
+          src={theme === "light" ? "/brand/icon-512-light.png" : "/brand/icon-512.png"}
           alt="ONE ASK"
           className={cn(iconSize[size], "rounded-[26%] shadow-[0_6px_24px_-6px_rgba(212,175,106,0.35)]")}
           draggable={false}
