@@ -10,6 +10,9 @@ import { ONE_ASK_CONFIG } from "@/data/config";
 // ---------------------------------------------------------------------------
 
 const STORAGE_KEY = "one-ask:config:v4";
+// Pre-rebrand key (app was called ASK ONE). Read-only fallback so a
+// configuration saved before the rename isn't orphaned in this browser.
+const LEGACY_STORAGE_KEY = "ask-one:config:v4";
 
 interface ConfigContextValue {
   config: OneAskConfig;
@@ -19,17 +22,21 @@ interface ConfigContextValue {
 
 const ConfigContext = createContext<ConfigContextValue | null>(null);
 
-function loadInitial(): OneAskConfig {
-  if (typeof window === "undefined") return ONE_ASK_CONFIG;
+function readStored(key: string): OneAskConfig | null {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return ONE_ASK_CONFIG;
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
     const parsed = JSON.parse(raw) as OneAskConfig;
-    if (!parsed.firms || !parsed.applications) return ONE_ASK_CONFIG;
+    if (!parsed.firms || !parsed.applications) return null;
     return parsed;
   } catch {
-    return ONE_ASK_CONFIG;
+    return null;
   }
+}
+
+function loadInitial(): OneAskConfig {
+  if (typeof window === "undefined") return ONE_ASK_CONFIG;
+  return readStored(STORAGE_KEY) ?? readStored(LEGACY_STORAGE_KEY) ?? ONE_ASK_CONFIG;
 }
 
 export function ConfigProvider({ children }: { children: ReactNode }) {
@@ -83,6 +90,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
     setConfig(ONE_ASK_CONFIG);
     try {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_STORAGE_KEY);
     } catch {
       // storage unavailable
     }
