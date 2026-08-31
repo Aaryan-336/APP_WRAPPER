@@ -158,38 +158,32 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
             </div>
 
             <div className="flex flex-col items-center overflow-hidden">
-              <h1 className="font-display text-5xl font-semibold tracking-tight sm:text-6xl">
-                <motion.span
-                  className="text-gradient-gold relative inline-block"
-                  initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: reduceMotion ? 0.25 : 0.6, delay: reduceMotion ? 0.05 : 0.55, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  ONE
-                  {!reduceMotion && (
-                    <motion.span
-                      aria-hidden
-                      className="pointer-events-none absolute inset-y-0 left-0 w-1/3 skew-x-[-18deg]"
-                      style={{
-                        background:
-                          "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)",
-                        mixBlendMode: "overlay",
-                      }}
-                      initial={{ x: "-140%", opacity: 0 }}
-                      animate={{ x: "340%", opacity: [0, 1, 0] }}
-                      transition={{ duration: 1.1, delay: 1.15, ease: "easeInOut" }}
-                    />
-                  )}
-                </motion.span>{" "}
-                <motion.span
-                  className="inline-block text-silver-100"
-                  initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ duration: reduceMotion ? 0.25 : 0.6, delay: reduceMotion ? 0.1 : 0.72, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  ASK
-                </motion.span>
-              </h1>
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0, y: reduceMotion ? 0 : 28, filter: reduceMotion ? "blur(0px)" : "blur(10px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                transition={{ duration: reduceMotion ? 0.25 : 0.65, delay: reduceMotion ? 0.05 : 0.55, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <img
+                  src="/brand/wordmark-primary.png"
+                  alt="ONE ASK"
+                  className="h-[52px] w-auto select-none sm:h-[64px] md:h-[72px]"
+                  draggable={false}
+                />
+                {!reduceMotion && (
+                  <motion.span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 left-0 w-1/3 skew-x-[-18deg]"
+                    style={{
+                      background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent)",
+                      mixBlendMode: "overlay",
+                    }}
+                    initial={{ x: "-140%", opacity: 0 }}
+                    animate={{ x: "340%", opacity: [0, 1, 0] }}
+                    transition={{ duration: 1.1, delay: 1.15, ease: "easeInOut" }}
+                  />
+                )}
+              </motion.div>
 
               <motion.span
                 className="mt-3 h-px bg-gradient-to-r from-transparent via-gold-400 to-transparent"
